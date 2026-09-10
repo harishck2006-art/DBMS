@@ -1,0 +1,300 @@
+[24bcs170@mepcolinux exp6]$ls
+ex6  ex6.prn
+[24bcs170@mepcolinux exp6]$cat ex6.prn
+Script started on Thu Mar 26 14:57:05 2026
+[?1034h[24bcs170@mepcolinux exp6]$cat ex6
+1) Simple View
+
+Question
+Create a view to display student name and department.
+
+SQL> CREATE VIEW student_info_view AS
+2 SELECT student_name, department
+3 FROM student;
+
+View created.
+
+SQL> SELECT * FROM student_info_view;
+
+STUDENT_NAME DEPARTMENT
+
+Arun CSE
+Karthik CSE
+Divya IT
+
+2) View with Condition
+
+Question
+Create a view to display students from CSE department.
+
+SQL> CREATE VIEW cse_students AS
+2 SELECT student_name, department, cgpa
+3 FROM student
+4 WHERE department = 'CSE';
+
+View created.
+
+SQL> SELECT * FROM cse_students;
+
+STUDENT_NAME DEPARTMENT CGPA
+
+Arun CSE 8.50
+Karthik CSE 7.80
+
+3) View with JOIN
+
+Question
+Create a view to display student name and job role.
+
+SQL> CREATE VIEW student_drive_view AS
+2 SELECT s.student_name, r.job_role
+3 FROM student s
+4 JOIN application a
+5 ON s.register_number = a.register_number
+6 JOIN recruitment_drive r
+7 ON a.drive_id = r.drive_id;
+
+View created.
+
+SQL> SELECT * FROM student_drive_view;
+
+STUDENT_NAME JOB_ROLE
+
+Arun Software Engineer
+Karthik Software Engineer
+Divya System Engineer
+
+4) View with Aggregate Function
+
+Question
+Create a view to display total applications per drive.
+
+SQL> CREATE VIEW total_applications AS
+2 SELECT drive_id, COUNT(*) AS total_students
+3 FROM application
+4 GROUP BY drive_id;
+
+View created.
+
+SQL> SELECT * FROM total_applications;
+
+DRIVE_ID TOTAL_STUDENTS
+
+101 2
+102 1
+
+5) View using another view
+
+SQL> CREATE VIEW high_application_drive AS
+2 SELECT *
+3 FROM total_applications
+4 WHERE total_students > 1;
+
+View created.
+
+SQL> SELECT * FROM high_application_drive;
+
+DRIVE_ID TOTAL_STUDENTS
+
+101 2
+
+6) View on Company Table
+
+SQL> CREATE VIEW company_view AS
+2 SELECT company_name, company_location
+3 FROM company;
+
+View created.
+
+SQL> SELECT * FROM company_view;
+
+COMPANY_NAME COMPANY_LOCATION
+
+TCS Chennai
+Infosys Bangalore
+
+7) View with GROUP BY
+
+SQL> CREATE VIEW department_count AS
+2 SELECT department, COUNT(*) AS total_students
+3 FROM student
+4 GROUP BY department;
+
+View created.
+
+SQL> SELECT * FROM department_count;
+
+DEPARTMENT TOTAL_STUDENTS
+
+CSE 2
+IT 1
+
+8) View with ORDER BY
+
+SQL> CREATE VIEW student_order AS
+2 SELECT student_name, cgpa
+3 FROM student
+4 ORDER BY cgpa DESC;
+
+View created.
+
+SQL> SELECT * FROM student_order;
+
+STUDENT_NAME CGPA
+
+Divya 9.10
+Arun 8.50
+Karthik 7.80
+
+9) Create Index on Student Table
+
+SQL> CREATE INDEX idx_student_department
+2 ON student(department);
+
+Index created.
+
+SQL> SELECT department, COUNT(*)
+2 FROM student
+3 GROUP BY department;
+
+DEPARTMENT COUNT(*)
+
+CSE 2
+IT 1
+
+10) Unique Index on Company Email
+
+SQL> CREATE UNIQUE INDEX idx_company_email
+2 ON company(email_id);
+
+Index created.
+
+11) Bitmap Index
+
+SQL> CREATE BITMAP INDEX idx_student_department_bitmap
+2 ON student(department);
+
+Index created.
+
+12) Composite Index
+
+SQL> CREATE INDEX idx_student_dept_cgpa
+2 ON student(department, cgpa);
+
+Index created.
+
+SQL> SELECT *
+2 FROM student
+3 WHERE department = 'CSE'
+4 AND cgpa > 8;
+
+REGISTER_NUMBER STUDENT_NAME DEPARTMENT CGPA
+
+21CS001 Arun CSE 8.50
+
+13) Function Based Index
+
+SQL> CREATE INDEX idx_upper_name
+2 ON student(UPPER(student_name));
+
+Index created.
+
+14) Index on Job Offer Salary
+
+SQL> CREATE INDEX idx_salary
+2 ON job_offer(offered_salary);
+
+Index created.
+
+15) Index on Recruitment Location
+
+SQL> CREATE INDEX idx_drive_location
+2 ON recruitment_drive(job_location);
+
+Index created.
+
+16) View for High CGPA Students
+
+SQL> CREATE VIEW high_cgpa_students AS
+2 SELECT student_name, department, cgpa
+3 FROM student
+4 WHERE cgpa > 8;
+
+View created.
+
+SQL> SELECT * FROM high_cgpa_students;
+
+STUDENT_NAME DEPARTMENT CGPA
+
+Arun CSE 8.50
+Divya IT 9.10
+
+17) View for Company and Job Role
+
+SQL> CREATE VIEW company_job_view AS
+2 SELECT c.company_name, r.job_role
+3 FROM company c
+4 JOIN recruitment_drive r
+5 ON c.company_id = r.company_id;
+
+View created.
+
+SQL> SELECT * FROM company_job_view;
+
+COMPANY_NAME JOB_ROLE
+
+TCS Software Engineer
+Infosys System Engineer
+
+18) Index on CGPA
+
+SQL> CREATE INDEX idx_student_cgpa
+2 ON student(cgpa);
+
+Index created.
+
+SQL> SELECT *
+2 FROM student
+3 WHERE cgpa > 8;
+
+STUDENT_NAME CGPA
+
+Arun 8.50
+Divya 9.10
+
+19) Composite Index on Application Table
+
+SQL> CREATE INDEX idx_application_reg_drive
+2 ON application(register_number, drive_id);
+
+Index created.
+
+SQL> SELECT *
+2 FROM application
+3 WHERE register_number = '21CS001';
+
+REGISTER_NUMBER DRIVE_ID STATUS
+
+21CS001 101 Applied
+
+20) View for Offered Students
+
+SQL> CREATE VIEW offered_students AS
+2 SELECT s.student_name, j.offered_salary
+3 FROM student s
+4 JOIN job_offer j
+5 ON s.register_number = j.register_number;
+
+View created.
+
+SQL> SELECT * FROM offered_students;
+
+STUDENT_NAME OFFERED_SALARY
+
+Arun 600000
+Divya 700000
+[24bcs170@mepcolinux exp6]$exit
+exit
+
+Script done on Thu Mar 26 14:57:12 2026
+[24bcs170@mepcolinux exp6]$
