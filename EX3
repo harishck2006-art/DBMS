@@ -1,0 +1,296 @@
+Script started on Thu Mar  5 11:43:41 2026
+[?1034h[24bcs170@mepcolinux ex4]$cat join
+LIST ALL COMBINATION OF STUDENT AND COMAPNIES
+
+SQL> SELECT student.student_name, company.company_name FROM student CROSS JOIN company;
+
+STUDENT_NAME         COMPANY_NAME
+-------------------- --------------------
+Arun                 TCS
+Arun                 TCS
+Divya                TCS
+Arun                 Infosys
+Arun                 Infosys
+Divya                Infosys
+
+6 rows selected.
+
+SHOW STUDENT WITH THEIR APPLICATIONS 
+
+SQL> SELECT * FROM student NATURAL JOIN application;
+
+REGISTER_NUMBER
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STUDENT_NAME         DEPARTMENT            CGPA
+-------------------- --------------- ----------
+SKILL
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EMAIL_ID                                                                                             PHOINE_NUMBER   GENDER     APPLICATION_ID APPLICATI APPLICATION_STATUS     DRIVE_ID
+---------------------------------------------------------------------------------------------------- --------------- ---------- -------------- --------- -------------------- ----------
+21CS001
+Arun                 CSE                    8.5
+Java
+arun@gmail.com                                                                                       9000000001      Male                 1001 12-FEB-26 Applied                     101
+
+21IT001
+Divya                IT                     9.1
+React
+divya@gmail.com                                                                                      9000000003      Female               1003 16-FEB-26 Shortlisted                 102
+
+SHOW APPLICATION WITH RECRUITMENT DRIVE
+
+SQL> SELECT * FROM application NATURAL JOIN recruitment_drive;
+
+  DRIVE_ID APPLICATION_ID APPLICATI APPLICATION_STATUS
+---------- -------------- --------- --------------------
+REGISTER_NUMBER
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DRIVE_DAT JOB_ROLE
+--------- ----------------------------------------------------------------------------------------------------
+JOB_LOCATION
+----------------------------------------------------------------------------------------------------
+CRITERIA
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COMPANY_ID
+----------
+       101           1001 12-FEB-26 Applied
+21CS001
+10-FEB-26 Software Engineer
+Chennai
+CGPA > 7
+         1
+
+       102           1003 16-FEB-26 Shortlisted
+21IT001
+15-FEB-26 System Engineer
+Bangalore
+CGPA > 8
+         2
+
+LIST STUDENTS WHO GOT JOB OFFER
+
+SQL> SELECT student.student_name, job_offer.offered_salary FROM student INNER JOIN job_offer ON student.register_number = job_offer.register_number;
+
+STUDENT_NAME         OFFERED_SALARY
+-------------------- --------------
+Arun                         750000
+Divya                        700000
+
+SHOW ALL STUDENTS WITH THEIR APPLIOCATION
+
+SQL> SELECT student.student_name, application.application_id FROM student LEFT JOIN application ON student.register_number = application.register_number;
+
+STUDENT_NAME         APPLICATION_ID
+-------------------- --------------
+Arun                           1001
+Divya                          1003
+
+SHOW ALL COMPANIES AND THEIR DRIVES 
+
+SQL> SELECT company.company_name, recruitment_drive.drive_id FROM company LEFT JOIN recruitment_drive ON company.company_id = recruitment_drive.company_id;
+
+COMPANY_NAME                                                                                           DRIVE_ID
+---------------------------------------------------------------------------------------------------- ----------
+TCS                                                                                                         101
+Infosys
+
+SHOW ALL APPLICATION WITH STUDENTS                                                                                                     102
+
+SQL> SELECT student.student_name, application.application_id FROM student RIGHT JOIN application ON student.register_number = application.register_number;
+
+STUDENT_NAME         APPLICATION_ID
+-------------------- --------------
+Arun                           1001
+Divya                          1003
+
+
+STUDENTS IN THE SAME DEPARTMENT 
+
+SQL> SELECT student1.student_name, student2.student_name FROM student student1 JOIN student student2 ON student1.cgpa = student2.cgpa AND student1.register_number <> student2.register_number;
+
+no rows selected
+
+STUDENTS WHO GOT SALARY >60000
+
+SQL> SELECT student.student_name, job_offer.offered_salary FROM student JOIN job_offer ON student.register_number = job_offer.register_number WHERE job_offer.offered_salary > 600000;
+
+STUDENT_NAME         OFFERED_SALARY
+-------------------- --------------
+Arun                         750000
+Divya                        700000
+
+TO COUNT STUDENTS PER DEPARTMENT 
+
+SQL> SELECT student.department, COUNT(*) FROM student GROUP BY student.department;
+
+DEPARTMENT        COUNT(*)
+--------------- ----------
+CSE                      1
+IT                       1
+
+TO DISPLAY SALARY IN DESC ORDER
+
+SQL> SELECT student.student_name, job_offer.offered_salary FROM student JOIN job_offer ON student.register_number = job_offer.register_number ORDER BY job_offer.offered_salary DESC;
+
+STUDENT_NAME         OFFERED_SALARY
+-------------------- --------------
+Arun                         750000
+Divya                        700000
+
+DISPLAY AVG CGPA >8 OF STUDENTS 
+
+SQL> SELECT student.department, AVG(student.cgpa) FROM student GROUP BY student.department HAVING AVG(student.cgpa) > 8;
+
+DEPARTMENT      AVG(STUDENT.CGPA)
+--------------- -----------------
+CSE                           8.5
+IT                            9.1
+
+
+DISPLAY HIGHEST SALARY OF A STUDENT 
+SQL> SELECT MAX(offered_salary) FROM job_offer;
+
+MAX(OFFERED_SALARY)
+-------------------
+             750000
+
+TO FIND TOTAL OFFERS
+
+SQL> SELECT COUNT(*) FROM job_offer;
+
+  COUNT(*)
+----------
+         2
+
+TO DISPLAY UNIQUE DEPARTMENT WITH COMAPNY 
+
+SQL> SELECT DISTINCT student.department, company.company_name FROM student, company;
+
+DEPARTMENT      COMPANY_NAME
+--------------- ----------------------------------------------------------------------------------------------------
+CSE             TCS
+CSE             Infosys
+IT              TCS
+IT              Infosys
+
+                                                                           *
+
+
+
+SQL> ALTER TABLE student ADD (email VARCHAR2(50));
+
+Table altered.
+
+
+SQL> INSERT INTO student (register_number, student_name, email) VALUES (101, 'Arun', 'arun@mail.com');
+
+1 row created.
+
+
+
+
+
+
+SQL> DESC placement_officer;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ OFFICER_ID                                                                                                        NOT NULL NUMBER(38)
+ OFFICER_NAME
+            VARCHAR2(100)
+ CONTACT_NO
+            VARCHAR2(15)
+ DEPARTMENT
+            VARCHAR2(50)
+ EMAIL_ID
+            VARCHAR2(100)
+
+SQL> ALTER TABLE placement_officer ADD (email VARCHAR2(50));
+
+Table altered.
+
+
+
+SQL> INSERT INTO placement_officer (officer_id, officer_name, email_id, email) VALUES (1, 'Arun', 'arun@mail.com', 'arun@mail.com');
+
+1 row created.
+
+SQL> SELECT email FROM student INTERSECT SELECT email FROM placement_officer;
+
+EMAIL
+--------------------------------------------------
+arun@mail.com
+
+FIND EMAIL IDS THAT ARE REGISTERED BOTH AS STUDENTS AND PLACCEMENT OFFICER 
+
+SQL> SELECT email_id FROM student INTERSECT SELECT email_id FROM placement_officer;
+
+no rows selected
+
+
+
+
+SQL> CREATE TABLE drive_applications (reg_no NUMBER, company_name VARCHAR2(50));
+
+Table created.
+
+SQL> CREATE TABLE job_offers (reg_no NUMBER, company_name VARCHAR2(50));
+
+Table created.
+
+SQL> INSERT INTO drive_applications VALUES (101, 'Google');
+
+1 row created.
+
+SQL> INSERT INTO drive_applications VALUES (102, 'Google');
+
+1 row created.
+
+SQL> INSERT INTO drive_applications VALUES (103, 'Microsoft');
+
+1 row created.
+
+SQL> INSERT INTO job_offers VALUES (101, 'Google');
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+REGISTER NO OF STUDENTS WHO APPLIED FOR A DRIVE BUT HAVE NOT RECEIVED A JOB OFFER YET 
+
+SQL> SELECT reg_no FROM drive_applications MINUS SELECT reg_no FROM job_offers;
+
+    REG_NO
+----------
+       102
+       103
+
+SQL> SELECT DISTINCT department, company_name FROM student CROSS JOIN company;
+
+DEPARTMENT      COMPANY_NAME
+--------------- ----------------------------------------------------------------------------------------------------
+                TCS
+CSE             TCS
+IT              TCS
+                Infosys
+CSE             Infosys
+IT              Infosys
+
+6 rows selected.
+
+SHOW A UINQUE LIST OF ALL NAMES FROM BOTH THE STUDENTS TABLE AND STAFF TABLE 
+
+SQL> SELECT student_name FROM student UNION SELECT staff_name FROM staff;
+
+STUDENT_NAME
+--------------------
+Arun
+Divya
+Ramesh
+Suresh
+
+[24bcs170@mepcolinux ex4]$exit
+exit
+
+Script done on Thu Mar  5 11:43:48 2026
