@@ -1,0 +1,472 @@
+Script started on Thu Apr  9 12:09:15 2026
+[?1034h[24bcs170@mepcolinux ex8]$cat main
+
+SQL> CREATE OR REPLACE TRIGGER trg_student_name_check
+  2
+  3  BEFORE INSERT ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF :NEW.NAME IS NULL THEN
+ 10
+ 11          RAISE_APPLICATION_ERROR(-20001, 'Student name cannot be empty.');
+ 12
+ 13      END IF;
+ 14
+ 15  END;
+ 16
+ 17  /
+
+Trigger created.
+
+SQL> SET SERVEROUTPUT ON;
+SQL> INSERT INTO STUDENT (STUDENTID, NAME, PHONE, GPA) VALUES (10, 'Arun', '9876543210', 8.5);
+
+1 row created.
+
+SQL> INSERT INTO STUDENT (STUDENTID, NAME, PHONE) VALUES (11, NULL, '9876543210');
+INSERT INTO STUDENT (STUDENTID, NAME, PHONE) VALUES (11, NULL, '9876543210')
+            *
+ERROR at line 1:
+ORA-20001: Student name cannot be empty.
+ORA-06512: at "SYSTEM.TRG_STUDENT_NAME_CHECK", line 5
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_STUDENT_NAME_CHECK'
+
+
+SQL> CREATE OR REPLACE TRIGGER trg_auto_application
+  2
+  3  AFTER INSERT ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      INSERT INTO APPLICATION (APPLICATIONID, STATUS, STUDENTID)
+ 10
+ 11      VALUES (500 + :NEW.STUDENTID, 'Applied', :NEW.STUDENTID);
+ 12
+ 13  END;
+ 14
+ 15  /
+
+Trigger created.
+
+SQL> INSERT INTO COMPANY (COMPANYID, NAME, SALARY) VALUES (101, 'TechCorp', 50000);
+INSERT INTO COMPANY (COMPANYID, NAME, SALARY) VALUES (101, 'TechCorp', 50000)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SYSTEM.SYS_C008332) violated
+
+
+SQL>
+SQL> CREATE OR REPLACE TRIGGER trg_student_phone_check
+  2
+  3  BEFORE INSERT ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF LENGTH(:NEW.PHONE) < 10 THEN
+ 10
+ 11          RAISE_APPLICATION_ERROR(-20002, 'Invalid phone number.');
+ 12
+ 13      END IF;
+ 14
+ 15  END;
+ 16
+ 17  /
+
+Trigger created.
+
+SQL> SELECT * FROM APPLICATION WHERE STUDENTID = 103;
+
+no rows selected
+
+SQL> INSERT INTO STUDENT (STUDENTID, NAME, PHONE, GPA) VALUES (11, 'Ajay', '12345', 7.0);
+INSERT INTO STUDENT (STUDENTID, NAME, PHONE, GPA) VALUES (11, 'Ajay', '12345', 7.0)
+            *
+ERROR at line 1:
+ORA-20002: Invalid phone number.
+ORA-06512: at "SYSTEM.TRG_STUDENT_PHONE_CHECK", line 5
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_STUDENT_PHONE_CHECK'
+
+
+SQL> CREATE OR REPLACE TRIGGER trg_log_application
+  2
+  3  AFTER INSERT ON APPLICATION
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      DBMS_OUTPUT.PUT_LINE('New application created for Student ID: ' || :NEW.STUDENTID);
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Trigger created.
+
+SQL> trg_log_application
+SP2-0734: unknown command beginning "trg_log_ap..." - rest of line ignored.
+SQL> CREATE OR REPLACE TRIGGER trg_company_name_check
+  2
+  3  BEFORE INSERT ON COMPANY
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF :NEW.NAME IS NULL THEN
+ 10
+ 11          RAISE_APPLICATION_ERROR(-20003, 'Company name cannot be empty.');
+ 12
+ 13      END IF;
+ 14
+ 15  END;
+ 16
+ 17  /
+
+Trigger created.
+
+SQL> INSERT INTO COMPANY (COMPANYID, NAME, SALARY) VALUES (100, NULL, 50000);
+INSERT INTO COMPANY (COMPANYID, NAME, SALARY) VALUES (100, NULL, 50000)
+            *
+ERROR at line 1:
+ORA-20003: Company name cannot be empty.
+ORA-06512: at "SYSTEM.TRG_COMPANY_NAME_CHECK", line 5
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_COMPANY_NAME_CHECK'
+
+
+SQL> CREATE OR REPLACE TRIGGER trg_lock_student_id
+  2
+  3  BEFORE UPDATE OF STUDENTID ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF :OLD.STUDENTID <> :NEW.STUDENTID THEN
+ 10
+ 11          RAISE_APPLICATION_ERROR(-20004, 'Student ID cannot be modified.');
+ 12
+ 13      END IF;
+ 14
+ 15  END;
+ 16
+ 17  /
+
+Trigger created.
+
+SQL> UPDATE STUDENT SET STUDENTID = 99 WHERE STUDENTID = 10;
+UPDATE STUDENT SET STUDENTID = 99 WHERE STUDENTID = 10
+       *
+ERROR at line 1:
+ORA-20004: Student ID cannot be modified.
+ORA-06512: at "SYSTEM.TRG_LOCK_STUDENT_ID", line 5
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_LOCK_STUDENT_ID'
+
+
+SQL> CREATE OR REPLACE TRIGGER trg_update_application_status
+  2
+  3  AFTER UPDATE OF GPA ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF :NEW.GPA >= 7 THEN
+ 10
+ 11          UPDATE APPLICATION
+ 12
+ 13          SET STATUS = 'Eligible'
+ 14
+ 15          WHERE STUDENTID = :NEW.STUDENTID;
+ 16
+ 17      END IF;
+ 18
+ 19  END;
+ 20
+ 21  /
+
+Trigger created.
+
+SQL>
+SQL>
+SQL> UPDATE STUDENT SET GPA = 9.0 WHERE STUDENTID = 10;
+
+1 row updated.
+
+SQL>
+SQL> SELECT STATUS FROM APPLICATION WHERE STUDENTID = 10;
+
+STATUS
+------------------------------
+Eligible
+
+SQL> CREATE OR REPLACE TRIGGER trg_check_salary
+  2
+  3  BEFORE UPDATE ON COMPANY
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF :NEW.SALARY < 0 THEN
+ 10
+ 11          RAISE_APPLICATION_ERROR(-20005, 'Salary cannot be negative.');
+ 12
+ 13      END IF;
+ 14
+ 15  END;
+ 16
+ 17  /
+
+Trigger created.
+
+SQL>
+SQL>
+SQL> INSERT INTO COMPANY (COMPANYID, NAME, SALARY) VALUES (101, 'TCS', 40000);
+INSERT INTO COMPANY (COMPANYID, NAME, SALARY) VALUES (101, 'TCS', 40000)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SYSTEM.SYS_C008332) violated
+
+
+SQL> UPDATE COMPANY SET SALARY = -500 WHERE COMPANYID = 101;
+UPDATE COMPANY SET SALARY = -500 WHERE COMPANYID = 101
+       *
+ERROR at line 1:
+ORA-20005: Salary cannot be negative.
+ORA-06512: at "SYSTEM.TRG_CHECK_SALARY", line 5
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_CHECK_SALARY'
+
+
+SQL> CREATE OR REPLACE TRIGGER trg_company_update_log
+  2
+  3  AFTER UPDATE ON COMPANY
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      DBMS_OUTPUT.PUT_LINE('Company updated: ' || :OLD.NAME);
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Trigger created.
+
+SQL> UPDATE COMPANY SET SALARY = 45000 WHERE COMPANYID = 101;
+Company updated: TCS
+
+1 row updated.
+
+SQL> CREATE OR REPLACE TRIGGER trg_cleanup_application
+  2
+  3  BEFORE DELETE ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      DELETE FROM APPLICATION
+ 10
+ 11      WHERE STUDENTID = :OLD.STUDENTID;
+ 12
+ 13  END;
+ 14
+ 15  /
+
+Trigger created.
+
+SQL>
+SQL> DELETE FROM STUDENT WHERE STUDENTID = 10;
+
+1 row deleted.
+
+SQL> SELECT * FROM APPLICATION WHERE STUDENTID = 10;
+
+no rows selected
+
+SQL> CREATE OR REPLACE TRIGGER trg_application_delete_log
+  2
+  3  AFTER DELETE ON APPLICATION
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      DBMS_OUTPUT.PUT_LINE('Application ID ' || :OLD.APPLICATIONID || ' deleted.');
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Trigger created.
+
+SQL> CREATE OR REPLACE TRIGGER trg_protect_admin_student
+  2
+  3  BEFORE DELETE ON STUDENT
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      IF :OLD.STUDENTID = 1 THEN
+ 10
+ 11          RAISE_APPLICATION_ERROR(-20006, 'Admin student cannot be deleted.');
+ 12
+ 13      END IF;
+ 14
+ 15  END;
+ 16
+ 17  /
+
+Trigger created.
+
+SQL> DELETE FROM STUDENT WHERE STUDENTID = 1;
+DELETE FROM STUDENT WHERE STUDENTID = 1
+            *
+ERROR at line 1:
+ORA-20006: Admin student cannot be deleted.
+ORA-06512: at "SYSTEM.TRG_PROTECT_ADMIN_STUDENT", line 5
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_PROTECT_ADMIN_STUDENT'
+
+
+SQL> CREATE OR REPLACE TRIGGER trg_company_audit
+  2
+  3  AFTER DELETE ON COMPANY
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9     DBMS_OUTPUT.PUT_LINE('Company removed: ' || :OLD.NAME);
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Trigger created.
+
+SQL>
+SQL> DELETE FROM COMPANY WHERE COMPANYID = 101;
+Company removed: TCS
+
+1 row deleted.
+
+SQL> CREATE OR REPLACE TRIGGER trg_status_change_log
+  2
+  3  AFTER UPDATE OF STATUS ON APPLICATION
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      DBMS_OUTPUT.PUT_LINE('Application status changed to: ' || :NEW.STATUS);
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Trigger created.
+
+SQL>
+SQL> UPDATE APPLICATION SET STATUS = 'Selected' WHERE APPLICATIONID = 501;
+Application status changed to: Selected
+
+1 row updated.
+
+
+A)	Write a code in PL/SQL to create a trigger that validates the availability of items before allowing an order to be placed, considering stock levels and pending orders.
+SQL>
+SQL> CREATE OR REPLACE TRIGGER trg_check_stock
+  2
+  3  BEFORE INSERT ON ORDERS
+  4
+  5  FOR EACH ROW
+  6
+  7  DECLARE
+  8
+  9      v_stock NUMBER;
+ 10
+ 11  BEGIN
+ 12
+ 13      SELECT STOCK_LEVEL INTO v_stock FROM ITEMS WHERE ITEM_ID = :NEW.ITEM_ID;
+ 14
+ 15      IF v_stock < :NEW.QUANTITY THEN
+ 16
+ 17          RAISE_APPLICATION_ERROR(-20001, 'Insufficient stock! Order cannot be placed.');
+ 18
+ 19      ELSE
+ 20
+ 21          UPDATE ITEMS SET STOCK_LEVEL = STOCK_LEVEL - :NEW.QUANTITY WHERE ITEM_ID = :NEW.ITEM_ID;
+ 22
+ 23      END IF;
+ 24
+ 25  END;
+ 26
+ 27  /
+
+Trigger created.
+
+SQL> INSERT INTO ORDERS VALUES (1, 101, 10);
+INSERT INTO ORDERS VALUES (1, 101, 10)
+            *
+ERROR at line 1:
+ORA-20001: Insufficient stock! Order cannot be placed.
+ORA-06512: at "SYSTEM.TRG_CHECK_STOCK", line 11
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_CHECK_STOCK'
+
+
+B)	Design a trigger that sends an email notification to a predefined address whenever an error occurs during a specific operation.
+SQL> CREATE TABLE ITEMS (ITEM_ID NUMBER PRIMARY KEY, ITEM_NAME VARCHAR2(50), STOCK_LEVEL NUMBER);
+
+Table created.
+
+SQL>
+SQL> CREATE TABLE ORDERS (ORDER_ID NUMBER PRIMARY KEY, ITEM_ID NUMBER, QUANTITY NUMBER, STATUS VARCHAR2(20));
+
+Table created.
+
+SQL> CREATE OR REPLACE TRIGGER trg_error_notification
+  2
+  3  BEFORE INSERT OR UPDATE ON ORDERS
+  4
+  5  FOR EACH ROW
+  6
+  7  BEGIN
+  8
+  9      -- Forcing an error if quantity is negative to test the trigger
+ 10
+ 11      IF :NEW.QUANTITY < 0 THEN
+ 12
+ 13          DBMS_OUTPUT.PUT_LINE('NOTIFICATION: Email sent to admin@example.com');
+ 14
+ 15          RAISE_APPLICATION_ERROR(-20005, 'Error: Negative quantity is not allowed!');
+ 16
+ 17      END IF;
+ 18
+ 19  END;
+ 20
+ 21  /
+
+Trigger created.
+
+SQL> INSERT INTO ORDERS (ORDER_ID, ITEM_ID, QUANTITY, STATUS) VALUES (1, 101, -5, 'Pending');
+NOTIFICATION: Email sent to admin@example.com
+INSERT INTO ORDERS (ORDER_ID, ITEM_ID, QUANTITY, STATUS) VALUES (1, 101, -5, 'Pending')
+            *
+ERROR at line 1:
+ORA-20005: Error: Negative quantity is not allowed!
+ORA-06512: at "SYSTEM.TRG_ERROR_NOTIFICATION", line 9
+ORA-04088: error during execution of trigger 'SYSTEM.TRG_ERROR_NOTIFICATION'
+
+
+[24bcs170@mepcolinux ex8]$exit
+exit
