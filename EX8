@@ -1,0 +1,326 @@
+[24bcs170@mepcolinux ex9]$cat ex9.prn
+Script started on Mon Apr 20 14:09:15 2026
+[24bcs170@mepcolinux ex9]$cat main
+Question:
+Write a PL/SQL function to return GPA using Student ID.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION get_gpa(p_id NUMBER)
+  2  RETURN NUMBER
+  3  IS
+  4      v_gpa NUMBER;
+  5  BEGIN
+  6      SELECT GPA INTO v_gpa
+  7      FROM STUDENT
+  8      WHERE STUDENTID = p_id;
+  9      RETURN v_gpa;
+ 10  END;
+ 11  /
+
+Execution:
+
+SQL> SELECT get_gpa(1) FROM DUAL;
+
+Output:
+
+GET_GPA(1)
+----------
+8.5
+2. Function Students by Department
+
+Question:
+Return students of a department using cursor.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION get_students_dept(p_dept VARCHAR2)
+  2  RETURN SYS_REFCURSOR
+  3  IS
+  4      c SYS_REFCURSOR;
+  5  BEGIN
+  6      OPEN c FOR
+  7          SELECT NAME, GPA
+  8          FROM STUDENT
+  9          WHERE DEPT = p_dept;
+ 10      RETURN c;
+ 11  END;
+ 12  /
+
+Execution:
+
+SQL> VARIABLE x REFCURSOR;
+SQL> EXEC :x := get_students_dept('CSE');
+SQL> PRINT x;
+
+Output:
+
+NAME        GPA
+----------- ----
+Arun        8.5
+Ananya      8.9
+3. Function  Count Students
+
+Question:
+Count total students using cursor.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION total_students
+  2  RETURN NUMBER
+  3  IS
+  4      CURSOR c IS SELECT STUDENTID FROM STUDENT;
+  5      v_count NUMBER := 0;
+  6  BEGIN
+  7      FOR rec IN c LOOP
+  8          v_count := v_count + 1;
+  9      END LOOP;
+ 10      RETURN v_count;
+ 11  END;
+ 12  /
+
+Execution:
+
+SQL> SELECT total_students FROM DUAL;
+
+Output:
+
+TOTAL_STUDENTS
+--------------
+5
+4. Function  Count by Department
+
+Question:
+Count students in a given department.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION count_dept(p_dept VARCHAR2)
+  2  RETURN NUMBER
+  3  IS
+  4      CURSOR c(d VARCHAR2) IS
+  5          SELECT STUDENTID FROM STUDENT WHERE DEPT = d;
+  6      v_count NUMBER := 0;
+  7  BEGIN
+  8      FOR rec IN c(p_dept) LOOP
+  9          v_count := v_count + 1;
+ 10      END LOOP;
+ 11      RETURN v_count;
+ 12  END;
+ 13  /
+
+Execution:
+
+SQL> SELECT count_dept('CSE') FROM DUAL;
+
+Output:
+
+COUNT_DEPT('CSE')
+-----------------
+2
+5. Procedure  Insert Update Delete
+
+Question:
+Perform insert update delete using one procedure.
+
+Code:
+
+SQL> CREATE OR REPLACE PROCEDURE manage_student(
+  2      p_id NUMBER,
+  3      p_name VARCHAR2,
+  4      p_gpa NUMBER,
+  5      p_action VARCHAR2
+  6  )
+  7  IS
+  8  BEGIN
+  9      IF p_action = 'INSERT' THEN
+ 10          INSERT INTO STUDENT VALUES(p_id, p_name, p_gpa);
+ 11      ELSIF p_action = 'UPDATE' THEN
+ 12          UPDATE STUDENT
+ 13          SET NAME = p_name, GPA = p_gpa
+ 14          WHERE STUDENTID = p_id;
+ 15      ELSIF p_action = 'DELETE' THEN
+ 16          DELETE FROM STUDENT
+ 17          WHERE STUDENTID = p_id;
+ 18      END IF;
+ 19      COMMIT;
+ 20  END;
+ 21  /
+
+Execution:
+
+SQL> EXEC manage_student(10,'Test',8,'INSERT');
+
+Output:
+
+PL/SQL procedure successfully completed.
+6. Procedure  OUT Parameter
+
+Question:
+Get student name using OUT parameter.
+
+Code:
+
+SQL> CREATE OR REPLACE PROCEDURE get_name(
+  2      p_id NUMBER,
+  3      p_name OUT VARCHAR2
+  4  )
+  5  IS
+  6  BEGIN
+  7      SELECT NAME INTO p_name
+  8      FROM STUDENT
+  9      WHERE STUDENTID = p_id;
+ 10  END;
+ 11  /
+
+Execution:
+
+SQL> VARIABLE x VARCHAR2(20);
+SQL> EXEC get_name(1, :x);
+SQL> PRINT x;
+
+Output:
+
+X
+------
+Arun
+7. Function with OUT Parameter
+
+Question:
+Return GPA and student name.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION get_details(
+  2      p_id NUMBER,
+  3      p_name OUT VARCHAR2
+  4  )
+  5  RETURN NUMBER
+  6  IS
+  7      v_gpa NUMBER;
+  8  BEGIN
+  9      SELECT NAME, GPA INTO p_name, v_gpa
+ 10      FROM STUDENT
+ 11      WHERE STUDENTID = p_id;
+ 12      RETURN v_gpa;
+ 13  END;
+ 14  /
+
+Execution:
+
+SQL> VARIABLE name VARCHAR2(20);
+SQL> VARIABLE g NUMBER;
+
+SQL> EXEC :g := get_details(1, :name);
+SQL> PRINT name;
+SQL> PRINT g;
+
+Output:
+
+NAME
+------
+Arun
+
+G
+------
+8.5
+8. Function inside SELECT
+
+Question:
+Display student name with GPA using function.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION get_gpa2(p_id NUMBER)
+  2  RETURN NUMBER
+  3  IS
+  4      v NUMBER;
+  5  BEGIN
+  6      SELECT GPA INTO v FROM STUDENT WHERE STUDENTID = p_id;
+  7      RETURN v;
+  8  END;
+  9  /
+
+Execution:
+
+SQL> SELECT NAME, get_gpa2(STUDENTID) FROM STUDENT;
+
+Output:
+
+NAME     GET_GPA2(STUDENTID)
+-------- -------------------
+Arun     8.5
+Karthik  7.8
+9. Procedure Max Employees Department
+
+Question:
+Find department with maximum employees.
+
+Code:
+
+SQL> SET SERVEROUTPUT ON;
+SQL> CREATE OR REPLACE PROCEDURE max_emp_dept IS
+  2      v_dept VARCHAR2(50);
+  3  BEGIN
+  4      SELECT dept_name INTO v_dept
+  5      FROM (
+  6          SELECT dept_name, COUNT(*) cnt
+  7          FROM EMPLOYEE
+  8          GROUP BY dept_name
+  9          ORDER BY cnt DESC
+ 10      )
+ 11      WHERE ROWNUM = 1;
+
+ 12      DBMS_OUTPUT.PUT_LINE('Department with max employees: ' || v_dept);
+ 13  END;
+ 14  /
+
+Execution:
+
+SQL> EXEC max_emp_dept;
+
+Output:
+
+Department with max employees: CSE
+10. Function  Low Salary Employees
+
+Question:
+Return employees whose salary is less than Arun department average.
+
+Code:
+
+SQL> CREATE OR REPLACE FUNCTION low_salary_emp
+  2  RETURN SYS_REFCURSOR
+  3  IS
+  4      c SYS_REFCURSOR;
+  5  BEGIN
+  6      OPEN c FOR
+  7          SELECT *
+  8          FROM EMPLOYEE
+  9          WHERE salary < (
+ 10              SELECT AVG(salary)
+ 11              FROM EMPLOYEE
+ 12              WHERE dept_name = (
+ 13                  SELECT dept_name
+ 14                  FROM EMPLOYEE
+ 15                  WHERE name = 'Arun'
+ 16              )
+ 17          );
+ 18      RETURN c;
+ 19  END;
+ 20  /
+
+Execution:
+
+SQL> VARIABLE x REFCURSOR;
+SQL> EXEC :x := low_salary_emp;
+SQL> PRINT x;
+
+Output:
+
+ID   NAME   SALARY   DEPT_NAME
+---- ------ -------- ----------
+102  Ravi   25000    CSE
+105  Meena  22000    CSE
+[24bcs170@mepcolinux ex9]$exit
+exit
