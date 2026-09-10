@@ -1,0 +1,346 @@
+Script started on Fri Mar  6 10:37:11 2026
+[?1034h[24bcs170@mepcolinux ex3]$cat ex3
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Thu Feb 05 2026 12:16:37 +05:30
+
+Connected to:
+Oracle Database 21c Standard Edition 2 Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+1 DISPLAY NAME OF A STUDENT CGPA>8
+
+SQL>  SELECT student_name FROM student WHERE cgpa > 8;
+
+STUDENT_NAME
+--------------------------------------------------------------------------------
+Arun
+Divya
+
+2 DISPLAY COMPANIES IN CHENNAI
+SQL> SELECT * FROM company WHEREcompany_location = ;
+
+
+
+REGISTER_NUMBER STUDENT_NAME         DEPARTMENT            CGPA SKILL           EMAIL_ID                  PHOINE_NUMBER
+--------------- -------------------- --------------- ---------- --------------- ------------------------- ---------------
+21CS001         Arun                 CSE                    8.5 Java            arun@gmail.com            9000000001
+21CS002         Karthik              CSE                    7.8 Python          karthik@gmail.com         9000000002
+21IT001         Divya                IT                     9.1 React           divya@gmail.com           9000000003
+
+
+
+3 DISPLAY STUDENTS FROM CSE DEPARTMENT
+
+SQL> SELECT * FROM student WHERE department = 'CSE';
+
+REGISTER_NUMBER STUDENT_NAME         DEPARTMENT            CGPA SKILL           EMAIL_ID                  PHOINE_NUMBER
+--------------- -------------------- --------------- ---------- --------------- ------------------------- ---------------
+21CS001         Arun                 CSE                    8.5 Java            arun@gmail.com            9000000001
+21CS002         Karthik              CSE                    7.8 Python          karthik@gmail.com         9000000002
+
+
+
+DISPLAY STUDENTS ORDERED BY CGPA (DESC)
+
+SQL> SELECT * FROM student ORDER BY cgpa DESC;
+
+REGISTER_NUMBER STUDENT_NAME         DEPARTMENT            CGPA SKILL           EMAIL_ID                  PHOINE_NUMBER
+--------------- -------------------- --------------- ---------- --------------- ------------------------- ---------------
+21IT001         Divya                IT                     9.1 React           divya@gmail.com           9000000003
+21CS001         Arun                 CSE                    8.5 Java            arun@gmail.com            9000000001
+21CS002         Karthik              CSE                    7.8 Python          karthik@gmail.com         9000000002
+
+
+
+TOTAL NO OF STUDENTS
+
+SQL> SELECT COUNT(*) FROM student;
+
+  COUNT(*)
+----------
+         3
+
+DISPLAY MAXIMUM CGPA OF A STUDENT
+
+SQL> SELECT MAX(cgpa) FROM student;
+
+ MAX(CGPA)
+----------
+       9.1
+
+
+
+SQL> SELECT * FROM company WHERE company_location LIKE '%Chennai%';
+
+COMPANY_ID COMPANY_NAME
+---------- ----------------------------------------------------------------------------------------------------
+COMPANY_ADDRESS
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COMPANY_LOCATION                                                                                     CONTACT_NUMBER  EMAIL_ID
+---------------------------------------------------------------------------------------------------- --------------- -------------------------
+         1 TCS
+Chennai OMR
+Chennai                                                                                              9876543210      tcs@gmail.com
+
+DISPLAY THE COMPANY LOCATIONS
+SQL> SELECT company_location FROM company;
+
+COMPANY_LOCATION
+----------------------------------------------------------------------------------------------------
+Chennai
+Bangalore
+
+
+
+DISPLAY STUDENT APPLIED FOR DRIVEID 101
+SQL> SELECT s.student_name FROM student s, application a WHERE s.register_number = a.register_number AND a.drive_id = 101;
+
+STUDENT_NAME
+--------------------
+Arun
+Karthik
+
+
+
+SQL> SELECT s.student_name, j.offered_salary FROM student s, job_offer j WHERE s.register_number = j.register_number;
+
+STUDENT_NAME         OFFERED_SALARY
+-------------------- --------------
+Arun                         600000
+Divya                        700000
+
+SQL>
+SQL> SELECT r.drive_id, c.company_name FROM recruitment_drive r, company c WHERE r.company_id = c.company_id;
+
+  DRIVE_ID COMPANY_NAME
+---------- ----------------------------------------------------------------------------------------------------
+       101 TCS
+       102 Infosys
+
+
+
+       302 28-FEB-26         700000 15-JUN-26 21IT001                     102
+
+
+         1
+TO DISPLAY THE JOB OFFERS
+
+
+SQL> SELECT * FROM job_offer;
+
+  OFFER_ID OFFER_DAT OFFERED_SALARY JOINING_D REGISTER_NUMBER        DRIVE_ID
+---------- --------- -------------- --------- -------------------- ----------
+       301 25-FEB-26         600000 01-JUN-26 21CS001                     101
+       302 28-FEB-26         700000 15-JUN-26 21IT001                     102
+       303 25-FEB-26         600000 01-JUN-26 21CS001                     101
+
+
+
+
+
+SQL> SELECT recruitment_drive.drive_id,company.company_name FROM recruitment_drive, company WHERE recruitment_drive.company_id = company.company_id;
+
+  DRIVE_ID
+----------
+COMPANY_NAME
+--------------------------------------------------------------------------------
+       102
+Infosys
+
+       101
+TCS
+
+TO UDATE THE APPLICATION STATUS
+
+SQL> UPDATE application
+  2  SET application_status = 'Selected'
+  3  WHERE application_id = 1001;
+
+1 row updated.
+
+TO UPDATE THE CGPA OF A STUDENTS
+
+SQL> UPDATE student
+  2  SET cgpa = 8.75
+  3  WHERE register_number = '21CS001';
+
+1 row updated.
+SQL>  UPDATE application SET application_status=  WHERE application_id = 1001;
+
+1 row updated.
+
+
+
+SQL> UPDATE student
+  2  SET cgpa = 8.75
+  3  WHERE register_number = '21CS001';
+
+1 row updated.
+SQL> UPDATE job_offer SET offered_salary = 750000 WHERE offer_id = 301;
+
+1 row updated.
+
+
+
+SQL> UPDATE job_offer SET offered_salary = 750000 WHERE offer_id = 301;
+
+1 row updated.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> SELECT offer_id, offered_salary FROM job_offer WHERE offer_id = 301;
+
+  OFFER_ID OFFERED_SALARY
+---------- --------------
+       301         750000
+
+COUNT STUDENTS DEPARTMENT WISE
+
+SQL>  SELECT department, COUNT(*) FROM student GROUP BY department;
+
+DEPARTMENT                                           COUNT(*)
+-------------------------------------------------- ----------
+CSE                                                         2
+IT                                                          1
+
+SQL> SELECT department, COUNT(*) FROM student GROUP BY department HAVING COUNT(*) > 1;
+
+DEPARTMENT                                           COUNT(*)
+-------------------------------------------------- ----------
+CSE
+                                                         2
+AVERAGE CGPA DEPARTMENT WISE
+
+SQL> SELECT department, AVG(cgpa) FROM student GROUP BY department;
+
+DEPARTMENT                                          AVG(CGPA)
+-------------------------------------------------- ----------
+CSE                                                      8.15
+IT                                                        9.1
+
+DISPLAY SALARAY > 650000
+SQL> SELECT register_number, MAX(offered_salary) AS "Highest_Offer" FROM job_offer GROUP BY register_number HAVING MAX(offered_salary) > 650000;
+
+REGISTER_NUMBER      Highest_Offer
+-------------------- -------------
+21CS001                     750000
+21IT001                     700000
+
+JOB OFFERS GENERATED
+
+SQL> SELECT COUNT(*) FROM job_offer;
+
+  COUNT(*)
+----------
+         2
+
+
+STUDENT WHO RECEIVED OFFER
+
+SQL> SELECT register_number, COUNT(*) FROM job_offer GROUP BY register_number;
+
+REGISTER_NUMBER        COUNT(*)
+-------------------- ----------
+21CS001                       1
+21IT001                       1
+
+STUDENT WGHO DID NOT GET OFFER
+
+SQL> SELECT COUNT(*) FROM student WHERE register_number NOT IN (SELECT register_number FROM job_offer);
+
+  COUNT(*)
+----------
+         1
+DISPLAY ONLY STUDENTN NAME AND DEPARTMENT
+
+SQL> SELECT student_name, department FROM student;
+
+STUDENT_NAME
+--------------------------------------------------------------------------------
+DEPARTMENT
+--------------------------------------------------
+Arun
+CSE
+
+Karthik
+CSE
+
+Divya
+IT
+
+STUDENT NAME STARTS WITH A
+SQL> SELECT student_name FROM student WHERE student_name LIKE 'A%';
+
+STUDENT_NAME
+--------------------------------------------------------------------------------
+Arun
+
+CGPA BETWEEN 7 AND 9
+
+SQL> SELECT student_name, cgpa FROM student WHERE cgpa BETWEEN 7 AND 9;
+
+STUDENT_NAME
+--------------------------------------------------------------------------------
+      CGPA
+----------
+Arun
+       8.5
+
+Karthik
+       7.8
+
+
+DISPLAY M,INIMUM CGPA OF A STUDENT
+
+SQL> SELECT MIN(cgpa) FROM student;
+
+ MIN(CGPA)
+----------
+       7.8
+
+SQL> CREATE TABLE drive (drive_id NUMBER(5) PRIMARY KEY, drive_date DATE, company_name VARCHAR2(20));
+
+Table created.
+
+DISPLAY DRIVE ID AND DRIVE DATE
+
+SQL> SELECT drive_id, drive_date FROM drive ORDER BY drive_date DESC;
+
+  DRIVE_ID DRIVE_DAT
+---------- ---------
+       102 15-MAR-26
+       101 10-MAR-26
+       103 05-MAR-26
+
+DELETE ONE APPLICATION OF A STIUDENT
+
+SQL> DELETE FROM application WHERE application_id = 1002;
+
+1 row deleted.
+
+DELETE ONE STRUDENT
+SQL> DELETE FROM student WHERE register_number = '21CS002';
+
+1 row deleted.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> SELECT * FROM student WHERE register_number = '21CS002';
+
+no rows selected
+
+SQL>
+[24bcs170@mepcolinux EXP3]$exit
+exit
+
+[24bcs170@mepcolinux ex3]$exit
+exit
+
