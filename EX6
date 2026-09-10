@@ -1,0 +1,689 @@
+[24bcs170@mepcolinux ex7]$cat EX7.prn
+Script started on Thu Apr  2 12:18:24 2026
+[?1034h[24bcs170@mepcolinux ex7]$cat main
+[24bcs170@mepcolinux ex8]$cat main
+PL/SQL
+
+ 1)TO DISPLAY ALL STUDENTS USING IMPLICIT CURSOR
+SQL> CREATE OR REPLACE PROCEDURE show_students IS
+  2
+  3  BEGIN
+  4
+  5      FOR stu IN (SELECT studentid, name, phone, gpa FROM STUDENT) LOOP
+  6
+  7          DBMS_OUTPUT.PUT_LINE(stu.studentid || ' ' || stu.name || ' ' || stu.phone || ' ' || stu.gpa);
+  8
+  9      END LOOP;
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Procedure created.
+
+SQL> EXEC show_students;
+
+PL/SQL procedure successfully completed.
+
+SQL> SET SERVEROUTPUT ON;
+SQL> EXEC show_students;
+1 Admin 9876543210 9
+2 Arun 9876543211 6
+3 Karthik 9876543212 5
+4 Divya 9876543213 6
+
+PL/SQL procedure successfully completed.
+
+2)DISPLAY STUDENTS WITH CGPA>7 USING IMPLICIT CURSOR
+
+SQL> CREATE OR REPLACE PROCEDURE high_gpa_students IS
+  2
+  3  BEGIN
+  4
+  5      FOR rec IN (SELECT name, gpa FROM STUDENT WHERE gpa > 7) LOOP
+  6
+  7          DBMS_OUTPUT.PUT_LINE(rec.name || ' - ' || rec.gpa);
+  8
+  9      END LOOP;
+ 10
+ 11  END;
+ 12
+ 13  /
+
+Procedure created.
+
+SQL> EXEC high_gpa_students;
+Admin - 9
+
+PL/SQL procedure successfully completed.
+
+
+3)DISPLAY STUDENT APPLICATION STATUS USING PARAMETERIZED CURSOR
+SQL> CREATE OR REPLACE PROCEDURE application_status IS
+  2
+  3      CURSOR student_cursor IS SELECT studentid, name FROM STUDENT;
+  4
+  5      CURSOR app_cursor(p_sid NUMBER) IS SELECT status FROM APPLICATION WHERE studentid = p_sid;
+  6
+  7  BEGIN
+  8
+  9      FOR stu IN student_cursor LOOP
+ 10
+ 11          DBMS_OUTPUT.PUT_LINE('Student: ' || stu.name);
+ 12
+ 13          FOR app IN app_cursor(stu.studentid) LOOP
+ 14
+ 15              DBMS_OUTPUT.PUT_LINE(' Status: ' || app.status);
+ 16
+ 17          END LOOP;
+ 18
+ 19      END LOOP;
+ 20
+ 21  END;
+ 22
+ 23  /
+
+Procedure created.
+
+SQL> EXEC application_status;
+Student: Admin
+Student: Arun
+Status: Applied
+Student: Karthik
+Status: Applied
+Student: Divya
+Status: Applied
+
+PL/SQL procedure successfully completed.
+
+
+4) DISPLAY COMPANY DETAILS USING CURSOR FOR LOOP
+SQL> CREATE OR REPLACE PROCEDURE company_details IS
+  2
+  3      CURSOR comp_cursor IS SELECT name, salary FROM COMPANY;
+  4
+  5  BEGIN
+  6
+  7      FOR rec IN comp_cursor LOOP
+  8
+  9          DBMS_OUTPUT.PUT_LINE(rec.name || ' Salary: ' || rec.salary);
+ 10
+ 11      END LOOP;
+ 12
+ 13  END;
+ 14
+ 15  /
+
+Procedure created.
+
+SQL> EXEC company_details;
+TCS Salary: 40000
+Infosys Salary: 45000
+Wipro Salary: 42000
+
+PL/SQL procedure successfully completed.
+
+5) TO DISPLAY TO COUNT TOTAL NO OF STUDENTS
+
+SQL> DECLARE
+  2
+  3      v_count NUMBER;
+  4
+  5  BEGIN
+  6
+  7      SELECT COUNT(*) INTO v_count FROM STUDENT;
+  8
+  9      DBMS_OUTPUT.PUT_LINE('Total Students: ' || v_count);
+ 10
+ 11  END;
+ 12
+ 13  /
+Total Students: 4
+
+
+
+6) TO UPDATE AOOLICATION STATUS OF THE STUDENT
+
+SQL> SET SERVEROUTPUT ON;
+SQL> BEGIN
+  2
+  3      UPDATE APPLICATION
+  4
+  5      SET STATUS = 'Selected'
+  6
+  7      WHERE APPLICATIONID = 501;
+  8
+  9
+ 10
+ 11      DBMS_OUTPUT.PUT_LINE('Application status updated successfully.');
+ 12
+ 13      COMMIT;
+ 14
+ 15  END;
+ 16
+ 17  /
+Application status updated successfully.
+
+PL/SQL procedure successfully completed.
+
+7)TO DISPLAY COMPANIUES OFFERING SALARY>42000
+
+SQL> BEGIN
+  2
+  3      FOR rec IN (SELECT name, salary FROM COMPANY WHERE salary > 42000) LOOP
+  4
+  5          DBMS_OUTPUT.PUT_LINE(rec.name || ' - Salary: ' || rec.salary);
+  6
+  7      END LOOP;
+  8
+  9  END;
+ 10
+ 11  /
+Infosys - Salary: 45000
+
+PL/SQL procedure successfully completed.
+
+8) TO DELETE A COMNPANY RECORD FROM THE COMPANY
+
+SQL> BEGIN
+  2
+  3      DELETE FROM COMPANY WHERE COMPANYID = 103;
+  4
+  5      COMMIT;
+  6
+  7      DBMS_OUTPUT.PUT_LINE('Company 103 deleted successfully.');
+  8
+  9  END;
+ 10
+ 11  /
+Company 103 deleted successfully.
+
+PL/SQL procedure successfully completed.
+
+9) TO DISPLAY THE TOO MANY ROWS IN THE STUDENT
+SQL> DECLARE
+  2
+  3      v_name STUDENT.NAME%TYPE;
+  4
+  5  BEGIN
+  6
+  7      -- This query will find Admin (9), Karthik (8), and Divya (7)
+  8
+  9      -- and try to force them into one 'v_name' variable.
+ 10
+ 11      SELECT name INTO v_name
+ 12
+ 13      FROM STUDENT
+ 14
+ 15      WHERE gpa >= 7;
+ 16
+ 17
+ 18      DBMS_OUTPUT.PUT_LINE('Student Name: ' || v_name);
+ 19
+ 20
+ 21  EXCEPTION
+ 22
+ 23      WHEN TOO_MANY_ROWS THEN
+ 24
+ 25          DBMS_OUTPUT.PUT_LINE('ERROR: Multiple students found with GPA >= 7!');
+ 26
+ 27          DBMS_OUTPUT.PUT_LINE('PL/SQL "SELECT INTO" can only handle one row at a time.');
+ 28
+ 29      WHEN NO_DATA_FOUND THEN
+ 30
+ 31          DBMS_OUTPUT.PUT_LINE('No students found with that GPA.');
+ 32
+ 33      WHEN OTHERS THEN
+ 34
+ 35          DBMS_OUTPUT.PUT_LINE('An unexpected error occurred.');
+ 36
+ 37  END;
+ 38
+ 39  /
+Student Name: Admin
+
+PL/SQL procedure successfully completed.
+
+10) TO DISPLAY THE STUDENTS WHO APPLIED FOR COMPANIES
+SQL> CREATE OR REPLACE PROCEDURE students_by_company(p_comp_name VARCHAR2) IS
+  2
+  3      CURSOR c_app IS
+  4
+  5          SELECT s.name, s.gpa, a.status
+  6
+  7          FROM STUDENT s
+  8
+  9          JOIN APPLICATION a ON s.studentid = a.studentid
+ 10
+ 11          JOIN COMPANY c ON a.companyid = c.companyid
+ 12
+ 13          WHERE c.name = p_comp_name;
+ 14
+ 15
+ 16
+ 17      v_found BOOLEAN := FALSE;
+ 18
+ 19  BEGIN
+ 20
+ 21      DBMS_OUTPUT.PUT_LINE('Students who applied to ' || p_comp_name || ':');
+ 22
+ 23      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 24
+ 25
+ 26
+ 27      FOR rec IN c_app LOOP
+ 28
+ 29          v_found := TRUE;
+ 30
+ 31          DBMS_OUTPUT.PUT_LINE('Name: ' || rec.name || ' | GPA: ' || rec.gpa || ' | Status: ' || rec.status);
+ 32
+ 33      END LOOP;
+ 34
+ 35
+ 36
+ 37      IF NOT v_found THEN
+ 38
+ 39          DBMS_OUTPUT.PUT_LINE('No applications found for this company.');
+ 40
+ 41      END IF;
+ 42
+ 43  END;
+ 44
+ 45  /
+
+Procedure created.
+
+SQL> EXEC students_by_company('TCS');
+Students who applied to TCS:
+-------------------------------------------
+Name: Arun | GPA: 6 | Status: Selected
+
+PL/SQL procedure successfully completed.
+
+11) TO UPDATE THE COMPANY SALARY
+SQL> BEGIN
+  2
+  3      UPDATE COMPANY
+  4
+  5      SET SALARY = SALARY * 1.10;
+  6
+  7
+  8
+  9      DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' companies received a 10% hike.');
+ 10
+ 11      COMMIT;
+ 12
+ 13  END;
+ 14
+ 15  /
+2 companies received a 10% hike.
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT * FROM COMPANY;
+
+ COMPANYID NAME                                                   SALARY
+---------- -------------------------------------------------- ----------
+       101 TCS                                                     44000
+       102 Infosys                                                 49500
+
+12)TO DELETE AN APPLICATION RECORD
+SQL> BEGIN
+  2
+  3      DELETE FROM APPLICATION
+  4
+  5      WHERE STATUS = 'Applied';
+  6
+  7
+  8
+  9      DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' "Applied" records have been cleared.');
+ 10
+ 11      COMMIT;
+ 12
+ 13  END;
+ 14
+ 15  /
+2 "Applied" records have been cleared.
+
+PL/SQL procedure successfully completed.
+
+13)TO DISPLAY TOTAL NO OF STUDENT
+SQL> DECLARE
+  2
+  3      lv_student_count NUMBER;
+  4
+  5  BEGIN
+  6
+  7
+  8
+  9      SELECT COUNT(*) INTO lv_student_count FROM STUDENT;
+ 10
+ 11
+ 12
+ 13      -- Display the result
+ 14
+ 15      DBMS_OUTPUT.PUT_LINE('------------------------------------');
+ 16
+ 17      DBMS_OUTPUT.PUT_LINE('Total Number of Students: ' || lv_student_count);
+ 18
+ 19      DBMS_OUTPUT.PUT_LINE('------------------------------------');
+ 20
+ 21  END;
+ 22
+ 23  /
+------------------------------------
+Total Number of Students: 4
+------------------------------------
+
+PL/SQL procedure successfully completed.
+
+14)TO DISPLAY COMPANY WITH MINIMUM SALARY
+SQL> DECLARE
+  2
+  3      mv_min_salary NUMBER;
+  4
+  5  BEGIN
+  6
+  7      -- 1. Find the actual minimum salary value from the table
+  8
+  9      SELECT MIN(SALARY) INTO mv_min_salary FROM COMPANY;
+ 10
+ 11
+ 12
+ 13      DBMS_OUTPUT.PUT_LINE('Minimum Salary found in Database: ' || mv_min_salary);
+ 14
+ 15      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 16
+ 17      DBMS_OUTPUT.PUT_LINE('Company(s) offering this salary:');
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23      FOR rec IN (SELECT NAME FROM COMPANY WHERE SALARY = mv_min_salary) LOOP
+ 24
+ 25          DBMS_OUTPUT.PUT_LINE('- ' || rec.NAME);
+ 26
+ 27      END LOOP;
+ 28
+ 29
+ 30
+ 31      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 32
+ 33  EXCEPTION
+ 34
+ 35      WHEN NO_DATA_FOUND THEN
+ 36
+ 37          DBMS_OUTPUT.PUT_LINE('The COMPANY table appears to be empty.');
+ 38
+ 39      WHEN OTHERS THEN
+ 40
+ 41          DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+ 42
+ 43  END;
+ 44
+ 45  /
+Minimum Salary found in Database: 44000
+-------------------------------------------
+Company(s) offering this salary:
+- TCS
+-------------------------------------------
+
+PL/SQL procedure successfully completed.
+
+15)BY USING PARAMETERIZED CURSOR TO FILTER STYUDENTS BY GPA
+SQL> DECLARE
+  2
+  3
+  4
+  5      CURSOR c_students(p_min_gpa NUMBER) IS
+  6
+  7          SELECT NAME, GPA
+  8
+  9          FROM STUDENT
+ 10
+ 11          WHERE GPA >= p_min_gpa
+ 12
+ 13          ORDER BY GPA DESC;
+ 14
+ 15
+ 16      -- Variable to hold the threshold we want to check
+ 17
+ 18      v_threshold NUMBER := 3.5;
+ 19
+ 20  BEGIN
+ 21
+ 22      DBMS_OUTPUT.PUT_LINE('Listing Students with GPA >= ' || v_threshold);
+ 23
+ 24      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 25
+ 26
+ 27
+ 29
+
+ 31      FOR r_stud IN c_students(v_threshold) LOOP
+ 32
+ 33          DBMS_OUTPUT.PUT_LINE('Student: ' || r_stud.NAME || ' | GPA: ' || r_stud.GPA);
+ 34
+ 35      END LOOP;
+ 36
+ 37
+ 38      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 39
+ 40  EXCEPTION
+ 41
+ 42      WHEN OTHERS THEN
+ 43
+ 44          DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+ 45
+ 46  END;
+ 47
+ 48  /
+Listing Students with GPA >= 3.5
+-------------------------------------------
+Student: Admin | GPA: 9
+Student: Divya | GPA: 6
+Student: Arun | GPA: 6
+Student: Karthik | GPA: 5
+-------------------------------------------
+
+PL/SQL procedure successfully completed.
+
+16)TO DISPLAY THE STUDENT AQND COMPANY NAMES(JOIN CURSOR)
+
+SQL> DECLARE
+  2
+  3
+  4
+  5
+  6
+  7      CURSOR c_app_details IS
+  8
+  9          SELECT s.NAME AS student_name,
+ 10
+ 11                 c.NAME AS company_name
+ 12
+ 13          FROM STUDENT s
+ 14
+ 15          JOIN APPLICATION a ON s.STUDENTID = a.STUDENTID
+ 16
+ 17          JOIN COMPANY c     ON a.COMPANYID = c.COMPANYID
+ 18
+ 19          ORDER BY s.NAME;
+ 20
+ 21  BEGIN
+ 22
+ 23      DBMS_OUTPUT.PUT_LINE('------------------------------------------------------------');
+ 24
+ 25      DBMS_OUTPUT.PUT_LINE(RPAD('STUDENT NAME', 25) || ' | ' || 'COMPANY NAME');
+ 26
+ 27      DBMS_OUTPUT.PUT_LINE('------------------------------------------------------------');
+ 28
+ 29
+ 30      -- Loop through the results
+ 31
+ 32      FOR rec IN c_app_details LOOP
+ 33
+ 35
+ 36          DBMS_OUTPUT.PUT_LINE(RPAD(rec.student_name, 25) || ' | ' || rec.company_name);
+ 37
+ 38      END LOOP;
+ 39
+ 40
+ 41      DBMS_OUTPUT.PUT_LINE('------------------------------------------------------------');
+ 42
+ 43  EXCEPTION
+ 44
+ 45      WHEN OTHERS THEN
+ 46
+ 47          DBMS_OUTPUT.PUT_LINE('Error retrieving data: ' || SQLERRM);
+ 48
+ 49  END;
+ 50
+ 51  /
+------------------------------------------------------------
+STUDENT NAME              | COMPANY NAME
+------------------------------------------------------------
+Arun                      | TCS
+------------------------------------------------------------
+
+PL/SQL procedure successfully completed.
+
+17)TO DISPLAY STUDENTS AND THEIR GPA USING FOR LOOP
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL>
+SQL> BEGIN
+  2
+  3      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+  4
+  5      DBMS_OUTPUT.PUT_LINE(RPAD('STUDENT NAME', 25) || ' | ' || 'CGPA');
+  6
+  7      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+  8
+  9
+ 10      -- The FOR loop automatically creates a record 'rec'
+ 11
+ 12      -- and populates it with data from the SELECT statement
+ 13
+ 14      FOR rec IN (SELECT NAME, GPA FROM STUDENT ORDER BY GPA DESC) LOOP
+ 15
+ 16          -- Displaying the student name and their CGPA (GPA)
+ 17
+ 18          DBMS_OUTPUT.PUT_LINE(RPAD(rec.NAME, 25) || ' | ' || rec.GPA);
+ 19
+ 20      END LOOP;
+ 21
+ 22
+ 23      DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 24
+ 25  EXCEPTION
+ 26
+ 27      WHEN NO_DATA_FOUND THEN
+ 28
+ 29          DBMS_OUTPUT.PUT_LINE('No students found in the database.');
+ 30
+ 31      WHEN OTHERS THEN
+ 32
+ 33          DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+ 34
+ 35  END;
+ 36
+ 37  /
+-------------------------------------------
+STUDENT NAME              | CGPA
+-------------------------------------------
+Admin                     | 9
+Divya                     | 6
+Arun                      | 6
+Karthik                   | 5
+-------------------------------------------
+SQL> SET SERVEROUTPUT ON;
+SQL>
+SQL
+: Declare cursor to count number of employees residing in sivakasi and earning salary higher than average salary of their departments wit necessary exception handling.>
+SQL> DECLARE
+  2
+  3
+  4
+  5      v_total_count NUMBER := 0;
+  6
+  7
+  8
+  9
+ 10
+ 11      CURSOR c_emp_filter IS
+ 12
+ 13          SELECT e.emp_name, e.salary, e.dept_id
+ 14
+ 15          FROM employees e
+ 16
+ 17          WHERE LOWER(e.city) = 'sivakasi'
+ 18
+ 19          AND e.salary > (
+ 20
+ 21              SELECT AVG(salary)
+ 22
+ 23              FROM employees
+ 24
+ 25              WHERE dept_id = e.dept_id
+ 26
+ 27          );
+ 28
+ 29
+ 30
+ 31
+ 32      no_records_found EXCEPTION;
+ 33
+ 34
+ 35  BEGIN
+ 36
+ 37      -- Process the cursor
+ 38
+ 39      FOR r_emp IN c_emp_filter LOOP
+ 40
+ 41          v_total_count := v_total_count + 1;
+ 42
+ 43          DBMS_OUTPUT.PUT_LINE('Found: ' || r_emp.emp_name || ' (Salary: ' || r_emp.salary || ')');
+ 44
+ 45      END LOOP;
+ 46
+ 47
+ 48
+ 49      IF v_total_count = 0 THEN
+ 50
+ 51          RAISE no_records_found;
+ 52
+ 53      ELSE
+ 54
+ 55          DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 56
+ 57          DBMS_OUTPUT.PUT_LINE('Total matching employees in Sivakasi: ' || v_total_count);
+ 58
+ 59          DBMS_OUTPUT.PUT_LINE('-------------------------------------------');
+ 60
+ 61      END IF;
+ 62
+ 63
+ 64  EXCEPTION
+ 65
+ 66      WHEN no_records_found THEN
+ 67
+ 68          DBMS_OUTPUT.PUT_LINE('Result: No employees in Sivakasi earn more than their dept average.');
+ 69
+ 70
+ 71
+ 72      WHEN OTHERS THEN
+ 73
+ 74          DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+ 75
+ 76  END;
+ 77
+ 78  /
+Found: Arun (Salary: 80000)
+-------------------------------------------
+Total matching employees in Sivakasi: 1
+-------------------------------------------
+[24bcs170@mepcolinux ex7]$exit
+exit
+
