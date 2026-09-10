@@ -1,0 +1,435 @@
+Script started on Thu Feb 12 12:13:48 2026
+[?1034h[24bcs170@mepcolinux DBMS]$cat EX2.DDL
+SQL>  CREATE TABLE company(
+  2           company_id INT PRIMARY KEY,
+  3           company_name VARCHAR(100),
+  4           company_address VARCHAR(300),
+  5           company_location VARCHAR (100),
+  6           contact_number VARCHAR(15),
+  7           email_id VARCHAR(100)
+  8           );
+
+Table created.
+
+SQL>  CREATE TABLE student(
+  2      register_number VARCHAR(20) PRIMARY KEY,
+  3      student_name VARCHAR(100),
+  4      department VARCHAR(50),
+  5      cgpa DECIMAL(3,2),
+  6      skill VARCHAR(200),
+  7      email_id VARCHAR(100),
+  8      phoine_number VARCHAR(15)
+  9      );
+
+Table created.
+
+SQL>    CREATE TABLE recruitment_drive(
+  2           drive_id INT PRIMARY KEY,
+  3           drive_date DATE,
+  4           job_role VARCHAR(100),
+  5           job_location VARCHAR(100),
+  6           criteria VARCHAR(200),
+  7           company_id INT,
+  8           FOREIGN KEY (company_id) REFERENCES company(company_id)
+  9           );
+
+Table created.
+
+SQL> 
+SQL>  CREATE TABLE application(
+  2      application_id INT PRIMARY KEY,
+  3      application_date DATE,
+  4      application_status VARCHAR(20),
+  5      register_number VARCHAR(200),
+  6      drive_id INT,
+  7      FOREIGN KEY (register_number) REFERENCES student(register_number),
+  8      FOREIGN KEY (drive_id) REFERENCES recruitment_drive(drive_id)
+  9      );
+
+Table created.
+
+SQL>      CREATE TABLE interview(
+  2           interview_id INT PRIMARY KEY,
+  3           interview_date DATE,
+  4           interview_mode VARCHAR(20),
+  5           round_no INT,
+  6           drive_id INT,
+  7           FOREIGN KEY (drive_id) REFERENCES recruitment_drive(drive_id)
+  8           );
+
+Table created.
+
+SQL> 
+SQL>     CREATE TABLE job_offer(
+  2           offer_id INT PRIMARY KEY,
+  3           offer_date DATE,
+  4           offered_salary DECIMAL(16,2),
+  5           joining_date DATE,
+  6           register_number VARCHAR(20),
+  7           drive_id INT,
+  8           FOREIGN KEY (register_number) REFERENCES student(register_number),
+  9           FOREIGN KEY (drive_id) REFERENCES recruitment_drive(drive_id)
+ 10          );
+
+Table created.
+
+SQL>  CREATE TABLE college(
+  2          college_id INT PRIMARY KEY,
+  3          college_name VARCHAR(100),
+  4          college_address VARCHAR(300),
+  5          contact_no VARCHAR(15),
+  6          college_emailid VARCHAR(100)
+  7      );
+
+Table created.
+
+SQL>  CREATE TABLE placement_officer(
+  2           officer_id INT PRIMARY KEY,
+  3           officer_name VARCHAR(100),
+  4           contact_no VARCHAR(15),
+  5           department VARCHAR(50),
+  6           email_id VARCHAR(100)
+  7           );
+
+Table created.
+
+
+
+
+SQL> CREATE TABLE Applies(
+  2  drive_id INT,
+  3  FOREIGN KEY (drive_id) REFERENCES recruitment_drive(drive_id),
+  4  register_number VARCHAR(200),
+  5  FOREIGN KEY (register_number) REFERENCES student(register_number)
+  6  );
+
+Table created.
+
+SQL> CREATE TABLE visit(
+  2  company_id INT,
+  3  FOREIGN KEY (company_id) REFERENCES company(company_id),
+  4  college_id INT,
+  5  FOREIGN KEY (college_id) REFERENCES college(college_id)_
+  6  );
+FOREIGN KEY (college_id) REFERENCES college(college_id)_
+                                                       *
+ERROR at line 5:
+ORA-00911: invalid character 
+
+
+SQL>  CREATE TABLE visit(
+  2      company_id INT,
+  3      FOREIGN KEY (company_id) REFERENCES company(company_id),
+  4      college_id INT,
+  5      FOREIGN KEY (college_id) REFERENCES college(college_id)
+  6      );
+
+Table created.
+
+SQL> CREATE TABLE attends(
+  2  interview_id INT,
+  3  FOREIGN KEY (interview_id) REFERENCES interview(interview_id),
+  4  register_number VARCHAR(200),
+  5  FOREIGN KEY (register_number) REFERENCES student(register_number)
+  6  );
+
+Table created.
+
+SQL> ALTER TABLE student
+  2  ADD gender VARCHAR(10);
+
+Table altered.
+
+SQL> INSERT INTO college VALUES (1, 'Mepco', 'Sivakasi', '9999999999', 'mepco@gmail.com');
+
+1 row created.
+
+SQL> INSERT INTO college VALUES (2, 'PSG', 'Coimbatore', '8888888888', 'psg@gmail.com');
+
+1 row created.
+
+SQL> INSERT INTO company VALUES (1, 'TCS', 'Chennai OMR', 'Chennai', '9876543210', 'tcs@gmail.com');
+
+1 row created.
+
+SQL> INSERT INTO company VALUES (2, 'Infosys', 'Bangalore EC', 'Bangalore', '9876500000', 'infosys@gmail.com');
+
+1 row created.
+
+
+
+
+SQL> INSERT INTO recruitment_drive VALUES (101, '10-FEB-2026', 'Software Engineer', 'Chennai', 'CGPA > 7', 1);
+
+1 row created.
+
+SQL> INSERT INTO recruitment_drive VALUES (102, '15-FEB-2026', 'System Engineer', 'Bangalore', 'CGPA > 8', 2);
+
+1 row created.
+
+
+
+
+
+
+SQL> INSERT INTO student VALUES ('21CS001', 'Arun', 'CSE', 8.50, 'Java', 'arun@gmail.com', '9000000001');INSERT INTO student VALUES ('21CS002', 'Karthik', 'CSE', 7.80, 'Python', 'karthik@gmail.com', '9000000002');INSERT INTO student VALUES ('21IT001', 'Divya', 'IT', 9.10, 'React', 'divya@gmail.com', '9000000003');
+INSERT INTO student VALUES ('21CS001', 'Arun', 'CSE', 8.50, 'Java', 'arun@gmail.com', '9000000001');INSERT INTO student VALUES ('21CS002', 'Karthik', 'CSE', 7.80, 'Python', 'karthik@gmail.com', '9000000002');INSERT INTO student VALUES ('21IT001', 'Divya', 'IT', 9.10, 'React', 'divya@gmail.com', '9000000003')
+                                                                                                   *
+
+
+SQL> INSERT INTO student VALUES ('21CS001', 'Arun', 'CSE', 8.50, 'Java', 'arun@gmail.com', '9000000001', 'Male');
+
+1 row created.
+
+
+
+
+SQL> 
+SQL> INSERT INTO student VALUES ('21CS002', 'Karthik', 'CSE', 7.80, 'Python', 'karthik@gmail.com', '9000000002', 'Male');
+
+1 row created.
+
+SQL> INSERT INTO student VALUES ('21IT001', 'Divya', 'IT', 9.10, 'React', 'divya@gmail.com', '9000000003', 'Female');
+
+1 row created.
+
+
+
+
+Commit complete.
+
+SQL> INSERT INTO student VALUES ('21CS001', 'Arun', 'CSE', 8.50, 'Java', 'arun@gmail.com', '9000000001', 'Male');
+
+1 row created.
+
+SQL> INSERT INTO student VALUES ('21CS002', 'Karthik', 'CSE', 7.80, 'Python', 'karthik@gmail.com', '9000000002', 'Male');
+
+1 row created.
+
+SQL> INSERT INTO student VALUES ('21IT001', 'Divya', 'IT', 9.10, 'React', 'divya@gmail.com', '9000000003', 'Female');
+
+1 row created.
+
+SQL> INSERT INTO company VALUES (1, 'TCS', 'Chennai OMR', 'Chennai', '9876543210', 'tcs@gmail.com');
+
+1 row created.
+
+SQL> INSERT INTO company VALUES (2, 'Infosys', 'Bangalore EC', 'Bangalore', '9876500000', 'infosys@gmail.com');
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> INSERT INTO recruitment_drive VALUES (101, '10-FEB-2026', 'Software Engineer', 'Chennai', 'CGPA > 7', 1);
+
+1 row created.
+
+SQL> INSERT INTO recruitment_drive VALUES (102, '15-FEB-2026', 'System Engineer', 'Bangalore', 'CGPA > 8', 2);
+
+1 row created.
+
+SQL> INSERT INTO application VALUES (1001, '12-FEB-2026', 'Applied', '21CS001', 101);
+
+1 row created.
+
+SQL> INSERT INTO application VALUES (1002, '12-FEB-2026', 'Applied', '21CS002', 101);
+
+1 row created.
+
+SQL> INSERT INTO application VALUES (1003, '16-FEB-2026', 'Shortlisted', '21IT001', 102);
+
+1 row created.
+
+SQL> COMMIT;
+
+SQL> SELECT table_name FROM user_tables;
+
+                                                          
+
+TABLE_NAME                                                                      
+--------------------------------------------------------------------------------
+SQLPLUS_PRODUCT_PROFILE                                                         
+HELP                                                                            
+COMPANY                                                                         
+STUDENT                                                                         
+RECRUITMENT_DRIVE                                                               
+APPLICATION                                                                     
+INTERVIEW                                                                       
+JOB_OFFER                                                                       
+COLLEGE                                                                         
+PLACEMENT_OFFICER                                                               
+APPLIES                                                                         
+
+TABLE_NAME                                                                      
+--------------------------------------------------------------------------------
+VISIT                                                                           
+ATTENDS   
+SQL> DESC company;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ COMPANY_ID                                                                                                        NOT NULL NUMBER(38)
+ COMPANY_NAME                                                                                                               VARCHAR2(100)
+ COMPANY_ADDRESS                                                                                                            VARCHAR2(300)
+ COMPANY_LOCATION                                                                                                           VARCHAR2(100)
+ CONTACT_NUMBER                                                                                                             VARCHAR2(15)
+ EMAIL_ID                                                                                                                   VARCHAR2(100)
+
+SQL> DESC recruitment_drive;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ DRIVE_ID                                                                                                          NOT NULL NUMBER(38)
+ DRIVE_DATE                                                                                                                 DATE
+ JOB_ROLE                                                                                                                   VARCHAR2(100)
+ JOB_LOCATION                                                                                                               VARCHAR2(100)
+ CRITERIA                                                                                                                   VARCHAR2(200)
+ COMPANY_ID                                                                                                                 NUMBER(38)
+
+SQL> DESC application;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ APPLICATION_ID                                                                                                    NOT NULL NUMBER(38)
+ APPLICATION_DATE                                                                                                           DATE
+ APPLICATION_STATUS                                                                                                         VARCHAR2(20)
+ REGSQL> CREATE TABLE Harish(
+  2    name VARCHAR(10),
+  3    birth VARCHAR(20)
+  4  );
+
+Table created.SQL> ALTER TABLE Harish RENAME COLUMN birth TO birth_date;
+
+Table altered.
+
+SQL> DESC Harish;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ NAME                                                                                                                       VARCHAR2(10)
+ BIRTH_DATE                                                                                                                 VARCHAR2(20)
+ GENDER                                                                                                                     VARCHAR2(10)
+
+SQL> ALTER TABLE Harish MODIFY (name VARCHAR2(50));
+
+Table altered.
+
+SQL> DESC HArish;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ NAME                                                                                                                       VARCHAR2(50)
+ BIRTH_DATE                                                                                                                 VARCHAR2(20)
+ GENDER                                                                                                                     VARCHAR2(10)
+
+SQL> ALTER TABLE Harish DROP COLUMN gender;
+
+Table altered.
+
+SQL> DESC Harish;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ NAME                                                                                                                       VARCHAR2(50)
+ BIRTH_DATEISTER_NUMBER                                                                                                            VARCHAR2(200)
+ DRIVE_ID                                                                                                                   NUMBER(38)
+
+SQL> DESC job_offer;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ OFFER_ID                                                                                                          NOT NULL NUMBER(38)
+ OFFER_DATE                                                                                                                 DATE
+ OFFERED_SALARY                                                                                                             NUMBER(16,2)
+ JOINING_DATE                                                                                                               DATE
+ REGISTER_NUMBER                                                                                                            VARCHAR2(20)
+ DRIVE_ID                                                                                                                   NUMBER(38)
+
+SQL> DESC placement_officer;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ OFFICER_ID                                                                                                        NOT NULL NUMBER(38)
+ OFFICER_NAME                                                                                                               VARCHAR2(100)
+ CONTACT_NO                                                                                                                 VARCHAR2(15)
+ DEPARTMENT                                                                                                                 VARCHAR2(50)
+ EMAIL_ID                                                                                                                   VARCHAR2(100)
+
+SQL> DESC colleg3e;
+ERROR:
+ORA-04043: object colleg3e does not exist
+
+
+SQL> DESC college;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ COLLEGE_ID                                                                                                        NOT NULL NUMBER(38)
+ COLLEGE_NAME                                                                                                               VARCHAR2(100)
+ COLLEGE_ADDRESS                                                                                                            VARCHAR2(300)
+ CONTACT_NO                                                                                                                 VARCHAR2(15)
+ COLLEGE_EMAILID                                                                                                            VARCHAR2(100)
+
+SQL> DESC interview;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ INTERVIEW_ID                                                                                                      NOT NULL NUMBER(38)
+ INTERVIEW_DATE                                                                                                             DATE
+ INTERVIEW_MODE                                                                                                             VARCHAR2(20)
+ ROUND_NO                                                                                                                   NUMBER(38)
+ DRIVE_ID                                                                                                                   NUMBER(38)
+
+SQL>Commit SQL> ALTER TABLE Harish ADD gender VARCHAR2(10);
+
+Table altered.
+
+SQL> ALTER TABLE Harish ADD CONSTRAINT gender_chk CHECK (gender IN ('Male', 'Female'));
+
+Table altered.
+
+SQL> DESC Harish;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ NAME                                                                                                                       VARCHAR2(50)
+ BIRTH_DATE                                                                                                                 VARCHAR2(20)
+ GENDER                                                                                                                     VARCHAR2(10)
+SQL> TRUNCATE TABLE Harish;
+
+Table truncated.
+
+SQL> DESC Harish;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ NAME                                                                                                                       VARCHAR2(50)
+ BIRTH_DATE                                                                                                                 VARCHAR2(20)
+ GENDER                                                                                                                     VARCHAR2(10)
+
+SQL> INSERT INTO Harish VALUES ('Harish', '12-FEB-2005', 'Male');
+
+1 row created.
+
+SQL> SELECT * FROM Harish;
+
+NAME                                               BIRTH_DATE           GENDER
+-------------------------------------------------- -------------------- --------
+Harish                                             12-FEB-2005          Male
+
+SQL> TRUNCATE TABLE Harish;
+
+Table truncated.
+
+SQL> TRUNCATE TABLE Harish;
+
+Table truncated.
+
+SQL> SELECT * FROM Harish;
+
+no rows selectedSQL> DESC student;
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ REGISTER_NUMBER                                                                                                   NOT NULL VARCHAR2(20)
+ STUDENT_NAME                                                                                                               VARCHAR2(100)
+ DEPARTMENT                                                                                                                 VARCHAR2(50)
+ CGPA                                                                                                                       NUMBER(3,2)
+ SKILL                                                                                                                      VARCHAR2(200)
+ EMAIL_ID                                                                                                                   VARCHAR2(100)
+ PHOINE_NUMBER                                                                                                              VARCHAR2(15)
+ GENDER                                                                                                                     VARCHAR2(10)
+
+SQL> DESC Harish;complete.
+[24bcs170@mepcolinux DBMS]$exit
+exit
+
+Script done on Thu Feb 12 12:14:02 2026
