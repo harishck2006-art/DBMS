@@ -1,0 +1,139 @@
+Script started on Thu Mar  5 12:03:53 2026
+[24bcs170@mepcolinux ex5]$cat sub
+STUDENTS WITH CGPA GREATER THAN AVERAGE CGPA
+
+SQL> SELECT register_number, student_name, cgpa FROM student WHERE cgpa > (SELECT AVG(cgpa) FROM student);
+
+REGISTER_NUMBER      STUDENT_NAME               CGPA
+-------------------- -------------------- ----------
+21IT001              Divya                       9.1
+
+STUDENTS WITH HIGHEST CGPA
+SQL> SELECT register_number, student_name FROM student WHERE cgpa = (SELECT MAX(cgpa) FROM student);
+
+REGISTER_NUMBER      STUDENT_NAME
+-------------------- --------------------
+21IT001              Divya
+
+STUDENTS WITH LOWEST CGPA 
+
+SQL> SELECT register_number, student_name FROM student WHERE cgpa = (SELECT MIN(cgpa) FROM student);
+
+REGISTER_NUMBER      STUDENT_NAME
+-------------------- --------------------
+21CS001              Arun
+
+TO DISPLAY COMPANIES CONDUCTING DRIVES
+
+SQL> SELECT company_name FROM company WHERE company_id IN (SELECT company_id FROM recruitment_drive);
+
+COMPANY_NAME
+--------------------
+TCS
+Infosys
+
+DISPLAY STUDENTS WHO APPLIED FOR DRIVES 
+
+SQL> SELECT student_name FROM student WHERE register_number IN (SELECT register_number FROM application);
+
+STUDENT_NAME
+--------------------
+Arun
+Divya
+
+STUDENTS WHO GOT JOB OFFER
+
+SQL> SELECT student_name FROM student WHERE register_number IN (SELECT register_number FROM job_offer);
+
+STUDENT_NAME
+--------------------
+Arun
+Divya
+
+STUDENTS WHO DID NOT GET JOB OFFER
+
+SQL> SELECT student_name FROM student WHERE register_number NOT IN (SELECT register_number FROM job_offer);
+
+STUDENT_NAME
+--------------------
+Arun
+
+ TO DISPLAY THE DRIVES CONDUCTED BY TCS
+
+SQL> SELECT drive_id, job_role FROM recruitment_drive WHERE company_id = (SELECT company_id FROM company WHERE company_name='TCS');
+
+  DRIVE_ID JOB_ROLE
+---------- ----------------------------------------------------------------------------------------------------
+       101 Software Engineer
+
+TO DISPLAY THE OFFERS WITH SALARY GREATER THAN AVERAGE SALARY
+
+SQL> SELECT offer_id, offered_salary FROM job_offer WHERE offered_salary > (SELECT AVG(offered_salary) FROM job_offer);
+
+  OFFER_ID OFFERED_SALARY
+---------- --------------
+       301         750000
+
+TO DISPLAY BTHE STUDENT WHO APPLIED MORE THAN ONE APPLOICATION
+
+SQL> SELECT * FROM (SELECT register_number, COUNT(*) AS total_app FROM application GROUP BY register_number) WHERE total_app > 1;
+
+no rows selected
+
+ TO DISPLAY THE STUDENBT CGPA GREATER THAN OF ALL OTHER STUDENTS 
+
+SQL> SELECT student_name FROM student WHERE cgpa > ALL (SELECT cgpa FROM student WHERE register_number <> '21IT001');
+
+no rows selected
+
+STUDENT CGPA LESS THAN ANY STUDENT
+
+SQL> SELECT student_name FROM student WHERE cgpa < ANY (SELECT cgpa FROM student);
+
+STUDENT_NAME
+--------------------
+Arun
+
+to display the drivces in chennai 
+
+SQL> SELECT drive_id, job_role FROM recruitment_drive WHERE job_location='Chennai';
+
+  DRIVE_ID JOB_ROLE
+---------- ----------------------------------------------------------------------------------------------------
+       101 Software Engineer
+
+To display the students from cse department 
+
+SQL> SELECT student_name FROM student WHERE department='CSE';
+
+STUDENT_NAME
+--------------------
+Arun
+TO DISPLAY THE STUDENT WITH CGPA >8
+
+SQL> SELECT student_name, cgpa FROM student WHERE cgpa > 8;
+
+STUDENT_NAME               CGPA
+-------------------- ----------
+Arun                        8.5
+Divya                       9.1
+
+SQL> SELECT COUNT(*) FROM student;
+
+  COUNT(*)
+----------
+         3
+BY USING WITH CLAUSE DRIVES ABOVE THE AVERAGE SALARY
+SQL> WITH avg_sal AS (SELECT AVG(offered_salary) AS avg_salary FROM job_offer) SELECT offer_id, offered_salary FROM job_offer, avg_sal WHERE offered_salary > avg_salary;
+
+  OFFER_ID OFFERED_SALARY
+---------- --------------
+       301         750000
+
+SQL> SELECT student_name FROM student WHERE register_number NOT IN (SELECT register_number FROM application WHERE register_number IS NOT NULL);
+
+STUDENT_NAME
+--------------------
+Arun
+[24bcs170@mepcolinux ex5]$exit
+exit
